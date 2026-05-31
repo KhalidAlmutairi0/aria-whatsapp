@@ -1,0 +1,27 @@
+{
+  "name": "aria-whatsapp",
+  "version": "1.0.0",
+  "description": "ARIA — Personal AI Chief of Staff on WhatsApp",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "openai": "^4.78.0",
+    "adhan": "^4.4.3",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "node-cron": "^3.0.3",
+    "twilio": "^5.3.3",
+    "uuid": "^11.0.5"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.0.0",
+    "@types/node-cron": "^3.0.11",
+    "@types/uuid": "^10.0.0",
+    "tsx": "^4.19.1",
+    "typescript": "^5.5.4"
+  }
+}
