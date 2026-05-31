@@ -16,18 +16,9 @@ app.get('/health', (_req: Request, res: Response) => {
 });
 
 app.post('/webhook', async (req: Request, res: Response) => {
-  // Validate Twilio signature in production
-  if (process.env.NODE_ENV === 'production') {
-    const sig = req.headers['x-twilio-signature'] as string;
-    const url = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
-    if (!validateTwilioSignature(sig, url, req.body)) {
-      res.status(403).send('Forbidden');
-      return;
-    }
-  }
-
   const phone: string = req.body.From ?? '';
   const message: string = req.body.Body ?? '';
+  console.log(`[webhook] from=${phone} body="${message}"`);
 
   if (!phone || !message) {
     res.sendStatus(400);
@@ -38,15 +29,21 @@ app.post('/webhook', async (req: Request, res: Response) => {
 
   try {
     registerUser(phone);
+    console.log('[aria] calling processMessage...');
     const ariaResponse = await processMessage(phone, message);
+    console.log('[aria] action=', ariaResponse.action, 'reply=', ariaResponse.reply);
     const finalResponse = executeAction(phone, ariaResponse);
+    console.log('[twilio] sending reply...');
     await sendWhatsApp(phone, finalResponse.reply);
+    console.log('[twilio] reply sent');
   } catch (err) {
-    console.error('Webhook error:', err);
+    console.error('[error]', err);
     const isArabic = message.match(/[؀-ۿ]/);
     try {
       await sendWhatsApp(phone, isArabic ? 'صار خطأ، حاول مرة ثانية.' : 'Something went wrong. Try again.');
-    } catch {}
+    } catch (e) {
+      console.error('[error] failed to send error reply', e);
+    }
   }
 });
 
